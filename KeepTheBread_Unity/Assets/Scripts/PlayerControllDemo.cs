@@ -1,11 +1,3 @@
-
-/*XXXXXXXXXX.XXXXXXXXXX.XXXXXXXXXX.XXXXXXXXXX
- ----------.----------.----------.----------
-(c)	Puxxe Studio | 2022
-	16/11/2022 (14:05:38)
- ----------.----------.----------.----------
-XXXXXXXXXX.XXXXXXXXXX.XXXXXXXXXX.XXXXXXXXXX*/
-
 namespace PuxxeStudio
 {
 
@@ -1137,30 +1129,38 @@ namespace PuxxeStudio
 		}
 
 		public float speed = 8f;
-		float hAxis;
-		float vAxis;
 
-		Vector3 moveVec;
 
-		private float xRotate, yRotate, xRotateMove, yRotateMove;
-		public float rotateSpeed = 0.1f;
+
+		[SerializeField]
+		private float lookSensitivity;
+
+		[SerializeField]
+		private float cameraRotationLimit;
+		private float currentCameraRotationX;
+
+		public Camera theCamera;
+
 		void Start()
 		{
 			UpdateAnimationAction();
 		}
+
 		void Update()
 		{
 
 			UpdateAnimationAction();
 
-			transform.Rotate(0f, -Input.GetAxis("Mouse X") * rotateSpeed, 0f, Space.World);
 
-			// hAxis = Input.GetAxisRaw("Horizontal");
-			vAxis = Input.GetAxisRaw("Vertical");
+			CharacterRotation();
+			CameraRotation();
+			Move();                 // 1️⃣ 키보드 입력에 따라 이동
+
+			// vAxis = Input.GetAxisRaw("Vertical");
 
 			//대각선 이동, 방향값이 1로 고정된 벡터
-			moveVec = new Vector3(0, 0, vAxis).normalized;
-			transform.position += moveVec * speed * Time.deltaTime;
+			// moveVec = new Vector3(0, 0, vAxis).normalized;
+			// transform.position += moveVec * speed * Time.deltaTime;
 
 			if (Input.GetKeyDown("w"))
 			{
@@ -1180,6 +1180,37 @@ namespace PuxxeStudio
 				Jump();
 			}
 		}
+
+
+		private void CharacterRotation()  // 좌우 캐릭터 회전
+		{
+			float _yRotation = Input.GetAxisRaw("Mouse X");
+			Vector3 _characterRotationY = new Vector3(0f, _yRotation, 0f) * lookSensitivity;
+			rigidbody.MoveRotation(rigidbody.rotation * Quaternion.Euler(_characterRotationY)); // 쿼터니언 * 쿼터니언																						// Debug.Log(myRigid.rotation);  // 쿼터니언																						// Debug.Log(myRigid.rotation.eulerAngles); // 벡터
+		}
+		private void CameraRotation()
+		{
+			float _xRotation = Input.GetAxisRaw("Mouse Y");
+			float _cameraRotationX = _xRotation * lookSensitivity;
+
+			currentCameraRotationX -= _cameraRotationX;
+			currentCameraRotationX = Mathf.Clamp(currentCameraRotationX, -cameraRotationLimit, cameraRotationLimit);
+
+			theCamera.transform.localEulerAngles = new Vector3(currentCameraRotationX, 0f, 0f);
+		}
+		private void Move() // 캐릭터 움직이기
+		{
+			float _moveDirX = Input.GetAxisRaw("Horizontal");
+			float _moveDirZ = Input.GetAxisRaw("Vertical");
+			Vector3 _moveHorizontal = transform.right * _moveDirX;
+			Vector3 _moveVertical = transform.forward * _moveDirZ;
+
+			Vector3 _velocity = (_moveHorizontal + _moveVertical).normalized * speed;
+
+			rigidbody.MovePosition(transform.position + _velocity * Time.deltaTime);
+		}
+
+
 		public void FindComponents()
 		{
 			rigidbody = GetComponent<Rigidbody>();
