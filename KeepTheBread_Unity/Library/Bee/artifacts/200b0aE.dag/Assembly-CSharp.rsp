@@ -364,6 +364,8 @@
 "Assets/PreAssets/NPC,PLAYER - Puxxe_Studio/3D_Low_Characters_V2/Scripts/HandObjectSwitching.cs"
 "Assets/PreAssets/NPC,PLAYER - Puxxe_Studio/3D_Low_Characters_V2/Scripts/PlayerControllDemo.cs"
 "Assets/PreAssets/NPC,PLAYER - Puxxe_Studio/3D_Low_Characters_V2/Scripts/ShowButtonsActionsAutoScroll.cs"
+"Assets/Scripts/CostumeSwitching.cs"
+"Assets/Scripts/PlayerControllDemo.cs"
 -langversion:9.0
 
 /deterministic
